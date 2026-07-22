@@ -1,24 +1,17 @@
 package com.framework.specifications;
 
+import com.framework.constants.ContentType;
 import com.framework.context.FrameworkContext;
+import com.framework.filters.RequestLoggingFilter;
+import com.framework.filters.ResponseLoggingFilter;
 import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 
-
-/**
- * Creates RequestSpecification for API requests.
- */
 public final class RequestSpecificationFactory {
 
     private RequestSpecificationFactory() {
     }
 
-    /**
-     * Creates default Request Specification.
-     *
-     * @return RequestSpecification
-     */
     public static RequestSpecification create() {
 
         return new RequestSpecBuilder()
@@ -28,9 +21,13 @@ public final class RequestSpecificationFactory {
                                 .config()
                                 .getBaseUrl())
 
-                .setContentType(ContentType.JSON)
+                .setContentType(ContentType.JSON.getValue())
 
-                .setAccept(ContentType.JSON)
+                .setAccept(ContentType.JSON.getValue())
+
+                .addFilter(new RequestLoggingFilter())
+
+                .addFilter(new ResponseLoggingFilter())
 
                 .build();
 

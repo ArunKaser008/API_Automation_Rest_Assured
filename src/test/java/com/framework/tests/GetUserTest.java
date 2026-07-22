@@ -1,6 +1,7 @@
 package com.framework.tests;
 
 import com.framework.client.BaseApiClient;
+import com.framework.core.request.ApiRequest;
 import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -13,12 +14,16 @@ public class GetUserTest {
     @Test
     public void shouldGetSingleUser() {
 
-        Response response =
-                apiClient.get("/api/users/2");
+        ApiRequest request = ApiRequest.get("/api/users/2")
+                .build();
+
+        Response response = apiClient.get(request);
+
+        Assert.assertEquals(response.statusCode(), 200);
 
         Assert.assertEquals(
-                response.statusCode(),
-                200);
+                response.jsonPath().getInt("data.id"),
+                2);
 
     }
 
