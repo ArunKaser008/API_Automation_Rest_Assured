@@ -1,56 +1,35 @@
 package com.framework.filters;
 
-import com.framework.utils.FrameworkLogger;
 import io.restassured.filter.Filter;
 import io.restassured.filter.FilterContext;
+import io.restassured.response.Response;
 import io.restassured.specification.FilterableRequestSpecification;
 import io.restassured.specification.FilterableResponseSpecification;
-import io.restassured.response.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * Logs incoming HTTP responses.
- */
 public class ResponseLoggingFilter implements Filter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResponseLoggingFilter.class);
 
     @Override
     public Response filter(FilterableRequestSpecification requestSpec,
                            FilterableResponseSpecification responseSpec,
-                           FilterContext filterContext) {
+                           FilterContext context) {
 
-        Response response =
-                filterContext.next(requestSpec, responseSpec);
+        Response response = context.next(requestSpec, responseSpec);
 
-        StringBuilder log = new StringBuilder();
+        LOGGER.info("========== HTTP RESPONSE ==========");
+        LOGGER.info("Response Time : {} ms", response.time());
 
-        log.append("\n================ HTTP RESPONSE ================\n");
-
-        log.append("Status Code : ")
-                .append(response.getStatusCode())
-                .append('\n');
-
-        log.append("Status Line : ")
-                .append(response.getStatusLine())
-                .append('\n');
-
-        log.append("Response Time : ")
-                .append(response.time())
-                .append(" ms\n");
-
-        log.append("\nHeaders\n");
-
+        LOGGER.info("Headers:");
         response.getHeaders().forEach(header ->
-                log.append(header.getName())
-                        .append(" : ")
-                        .append(header.getValue())
-                        .append('\n'));
+                LOGGER.info("{} : {}", header.getName(), header.getValue()));
 
-        log.append("\nBody\n");
+        LOGGER.info("Body:");
+        LOGGER.info(response.asPrettyString());
 
-        log.append(response.asPrettyString()).append('\n');
-
-        log.append("==============================================");
-
-        FrameworkLogger.info(log.toString());
+        LOGGER.info("====================================");
 
         return response;
     }

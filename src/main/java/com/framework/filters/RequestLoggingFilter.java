@@ -1,82 +1,37 @@
 package com.framework.filters;
 
-import com.framework.utils.FrameworkLogger;
 import io.restassured.filter.Filter;
 import io.restassured.filter.FilterContext;
+import io.restassured.response.Response;
 import io.restassured.specification.FilterableRequestSpecification;
 import io.restassured.specification.FilterableResponseSpecification;
-import io.restassured.response.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * Logs outgoing HTTP requests.
- */
 public class RequestLoggingFilter implements Filter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RequestLoggingFilter.class);
 
     @Override
     public Response filter(FilterableRequestSpecification requestSpec,
                            FilterableResponseSpecification responseSpec,
-                           FilterContext filterContext) {
+                           FilterContext context) {
 
-        StringBuilder log = new StringBuilder();
+        LOGGER.info("========== HTTP REQUEST ==========");
+        LOGGER.info("Method : {}", requestSpec.getMethod());
+        LOGGER.info("Headers:");
+        requestSpec.getHeaders().forEach(header ->
+                LOGGER.info("{} : {}", header.getName(), header.getValue()));
 
-        log.append("\n================ HTTP REQUEST ================\n");
-
-        log.append("Method : ")
-                .append(requestSpec.getMethod())
-                .append('\n');
-
-        log.append("URI    : ")
-                .append(requestSpec.getURI())
-                .append('\n');
-
-        if (!requestSpec.getHeaders().asList().isEmpty()) {
-
-            log.append("\nHeaders\n");
-
-            requestSpec.getHeaders().forEach(header ->
-                    log.append(header.getName())
-                            .append(" : ")
-                            .append(header.getValue())
-                            .append('\n'));
+        if (requestSpec.getBody() != null) {
+            LOGGER.info("Body:");
+            LOGGER.info(requestSpec.getBody().toString());
+        } else {
+            LOGGER.info("Body: [No Body]");
         }
 
-        if (!requestSpec.getQueryParams().isEmpty()) {
+        LOGGER.info("====================================");
 
-            log.append("\nQuery Parameters\n");
-
-            requestSpec.getQueryParams()
-                    .forEach((key, value) ->
-                            log.append(key)
-                                    .append(" = ")
-                                    .append(value)
-                                    .append('\n'));
-        }
-
-        if (!requestSpec.getPathParams().isEmpty()) {
-
-            log.append("\nPath Parameters\n");
-
-            requestSpec.getPathParams()
-                    .forEach((key, value) ->
-                            log.append(key)
-                                    .append(" = ")
-                                    .append(value)
-                                    .append('\n'));
-        }
-
-        Object body = requestSpec.getBody();
-
-        if (body != null) {
-
-            log.append("\nBody\n");
-
-            log.append(body).append('\n');
-        }
-
-        log.append("==============================================");
-
-        FrameworkLogger.info(log.toString());
-
-        return filterContext.next(requestSpec, responseSpec);
+        return context.next(requestSpec, responseSpec);
     }
 }

@@ -1,6 +1,8 @@
 package com.framework.client;
 
 import com.framework.config.ConfigManager;
+import com.framework.filters.RequestLoggingFilter;
+import com.framework.filters.ResponseLoggingFilter;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.HttpClientConfig;
 import io.restassured.config.RestAssuredConfig;
@@ -43,6 +45,8 @@ public final class RequestSpecificationFactory {
                 .setContentType(ContentType.JSON)
 
                 .setAccept(ContentType.JSON)
+
+                .addFilter(new RequestLoggingFilter())
 
                 .setRelaxedHTTPSValidation()
 

@@ -156,4 +156,21 @@ public final class ConfigManager {
 
     }
 
+    public long getResponseTimeout() {
+
+        try {
+
+            return Long.parseLong(
+                    get(FrameworkConfig.RESPONSE_TIMEOUT));
+
+        } catch (NumberFormatException exception) {
+
+            throw new ConfigurationException(
+                    "Invalid response timeout.",
+                    exception);
+
+        }
+
+    }
+
 }

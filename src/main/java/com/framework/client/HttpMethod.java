@@ -1,4 +1,14 @@
 package com.framework.client;
 
-public class HttpMethod {
+/**
+ * Supported HTTP methods.
+ */
+public enum HttpMethod {
+
+    GET,
+    POST,
+    PUT,
+    PATCH,
+    DELETE
+
 }

@@ -1,21 +1,20 @@
 package com.framework.client;
 
-import io.restassured.RestAssured;
+import com.framework.core.executor.HttpExecutor;
+import com.framework.core.executor.HttpExecutorRegistry;
+import com.framework.models.ApiRequest;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 /**
  * Generic HTTP client responsible for executing REST requests.
- *
- * This class hides Rest Assured implementation from the
- * business API layer.
  */
 public class ApiClient {
 
     private final RequestSpecification requestSpecification;
 
     /**
-     * Creates ApiClient with default request specification.
+     * Creates ApiClient with default Request Specification.
      */
     public ApiClient() {
 
@@ -25,9 +24,9 @@ public class ApiClient {
     }
 
     /**
-     * Creates ApiClient with custom request specification.
+     * Creates ApiClient with custom Request Specification.
      *
-     * Useful for authenticated requests or multipart requests.
+     * @param requestSpecification Request Specification
      */
     public ApiClient(RequestSpecification requestSpecification) {
 
@@ -35,76 +34,51 @@ public class ApiClient {
 
     }
 
-    /**
-     * Executes HTTP GET request.
-     *
-     * @param endpoint API endpoint
-     * @return Response
-     */
-    public Response get(String endpoint) {
+    public Response get(ApiRequest request) {
 
-        return RestAssured
-                .given(requestSpecification)
-                .when()
-                .get(endpoint);
+        return execute(HttpMethod.GET, request);
+
+    }
+
+    public Response post(ApiRequest request) {
+
+        return execute(HttpMethod.POST, request);
+
+    }
+
+    public Response put(ApiRequest request) {
+
+        return execute(HttpMethod.PUT, request);
+
+    }
+
+    public Response patch(ApiRequest request) {
+
+        return execute(HttpMethod.PATCH, request);
+
+    }
+
+    public Response delete(ApiRequest request) {
+
+        return execute(HttpMethod.DELETE, request);
 
     }
 
     /**
-     * Executes HTTP POST request.
-     *
-     * @param endpoint API endpoint
-     * @param body Request payload
-     * @return Response
+     * Generic HTTP execution.
      */
-    public Response post(String endpoint,
-                         Object body) {
+    private Response execute(HttpMethod httpMethod,
+                             ApiRequest apiRequest) {
 
-        return RestAssured
-                .given(requestSpecification)
-                .body(body)
-                .when()
-                .post(endpoint);
+        HttpExecutor executor =
+                HttpExecutorRegistry.get(httpMethod);
 
-    }
-
-    /**
-     * Executes HTTP PUT request.
-     */
-    public Response put(String endpoint,
-                        Object body) {
-
-        return RestAssured
-                .given(requestSpecification)
-                .body(body)
-                .when()
-                .put(endpoint);
-
-    }
-
-    /**
-     * Executes HTTP PATCH request.
-     */
-    public Response patch(String endpoint,
-                          Object body) {
-
-        return RestAssured
-                .given(requestSpecification)
-                .body(body)
-                .when()
-                .patch(endpoint);
-
-    }
-
-    /**
-     * Executes HTTP DELETE request.
-     */
-    public Response delete(String endpoint) {
-
-        return RestAssured
-                .given(requestSpecification)
-                .when()
-                .delete(endpoint);
+        return executor
+                .execute(requestSpecification, apiRequest)
+                .then()
+                .spec(ResponseSpecificationFactory.createDefault())
+                .extract()
+                .response();
 
     }
 

@@ -25,4 +25,6 @@ public final class FrameworkConfig {
 
     public static final String READ_TIMEOUT = "read.timeout";
 
+    public static final String RESPONSE_TIMEOUT = "response.timeout";
+
 }
