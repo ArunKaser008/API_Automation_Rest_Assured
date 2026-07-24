@@ -14,7 +14,7 @@ public final class FrameworkContext {
 
     private FrameworkContext() {
 
-        this.configManager = new ConfigManager();
+        this.configManager = ConfigManager.getInstance();
 
     }
 

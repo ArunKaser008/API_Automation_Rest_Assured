@@ -3,31 +3,52 @@ package com.framework.config;
 import java.util.Properties;
 
 /**
- * Provides type-safe access to framework configuration.
+ * Provides centralized and type-safe access to framework configuration.
+ *
+ * Configuration is loaded only once during framework initialization.
  */
 public final class ConfigManager {
 
     private final Properties properties;
 
     /**
-     * Creates ConfigManager and loads configuration
-     * for the selected environment.
+     * Private constructor to prevent external instantiation.
      */
-    public ConfigManager() {
+    private ConfigManager() {
 
         String environmentName =
-                System.getProperty("environment", "qa");
+                System.getProperty("environment", "prod");
 
         Environment environment =
                 Environment.from(environmentName);
 
         this.properties =
                 ConfigurationLoader.load(environment);
+    }
+
+    /**
+     * Holder class for lazy-loaded singleton instance.
+     */
+    private static class Holder {
+
+        private static final ConfigManager INSTANCE =
+                new ConfigManager();
 
     }
 
     /**
-     * Returns property by key.
+     * Returns the singleton instance.
+     *
+     * @return ConfigManager instance
+     */
+    public static ConfigManager getInstance() {
+
+        return Holder.INSTANCE;
+
+    }
+
+    /**
+     * Returns property value by key.
      *
      * @param key property key
      * @return property value
@@ -48,31 +69,73 @@ public final class ConfigManager {
     }
 
     /**
+     * Returns integer property.
+     *
+     * @param key property key
+     * @return integer value
+     */
+    private int getInt(String key) {
+
+        try {
+
+            return Integer.parseInt(get(key));
+
+        } catch (NumberFormatException exception) {
+
+            throw new ConfigurationException(
+                    "Invalid integer value for property : " + key,
+                    exception);
+
+        }
+
+    }
+
+    /**
+     * Returns boolean property.
+     *
+     * @param key property key
+     * @return boolean value
+     */
+    private boolean getBoolean(String key) {
+
+        return Boolean.parseBoolean(get(key));
+
+    }
+
+    /**
      * Returns Base URL.
      */
     public String getBaseUrl() {
+
         return get(FrameworkConfig.BASE_URL);
+
     }
 
     /**
      * Returns Username.
      */
     public String getUsername() {
+
         return get(FrameworkConfig.USERNAME);
+
     }
 
     /**
      * Returns Password.
      */
     public String getPassword() {
+
         return get(FrameworkConfig.PASSWORD);
+
     }
 
     /**
      * Returns API Key.
      */
     public String getApiKey() {
+
         return get(FrameworkConfig.API_KEY);
+
     }
 
     /**
@@ -80,17 +143,7 @@ public final class ConfigManager {
      */
     public int getConnectionTimeout() {
 
-        try {
-            return Integer.parseInt(
-                    get(FrameworkConfig.CONNECTION_TIMEOUT));
-
-        } catch (NumberFormatException exception) {
-
-            throw new ConfigurationException(
-                    "Invalid connection timeout value.",
-                    exception);
-
-        }
+        return getInt(FrameworkConfig.CONNECTION_TIMEOUT);
 
     }
 
@@ -99,18 +152,7 @@ public final class ConfigManager {
      */
     public int getReadTimeout() {
 
-        try {
-
-            return Integer.parseInt(
-                    get(FrameworkConfig.READ_TIMEOUT));
-
-        } catch (NumberFormatException exception) {
-
-            throw new ConfigurationException(
-                    "Invalid read timeout value.",
-                    exception);
-
-        }
+        return getInt(FrameworkConfig.READ_TIMEOUT);
 
     }
 
