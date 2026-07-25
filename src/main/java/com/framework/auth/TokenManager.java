@@ -39,7 +39,7 @@ public final class TokenManager {
 
             if (!isTokenValid()) {
 
-                refreshT    oken();
+                refreshToken();
 
             }
 
@@ -67,6 +67,25 @@ public final class TokenManager {
         expiryTime =
                 System.currentTimeMillis()
                         + (50 * 60 * 1000);
+
+    }
+
+    /**
+     * Forces token refresh immediately (thread-safe).
+     */
+    public static void forceRefresh() {
+
+        LOCK.lock();
+
+        try {
+
+            refreshToken();
+
+        } finally {
+
+            LOCK.unlock();
+
+        }
 
     }
 

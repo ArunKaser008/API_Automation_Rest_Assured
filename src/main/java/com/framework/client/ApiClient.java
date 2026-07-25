@@ -73,12 +73,29 @@ public class ApiClient {
         HttpExecutor executor =
                 HttpExecutorRegistry.get(httpMethod);
 
-        return executor
+        Response response = executor
                 .execute(requestSpecification, apiRequest)
                 .then()
                 .spec(ResponseSpecificationFactory.createDefault())
                 .extract()
                 .response();
+
+        // If unauthorized and using bearer auth, try refreshing token once and retry
+        if (response.getStatusCode() == 401 && apiRequest.getAuthType() == com.framework.auth.AuthType.BEARER) {
+
+            // Force refresh token and retry the request once
+            com.framework.auth.TokenManager.forceRefresh();
+
+            response = executor
+                    .execute(requestSpecification, apiRequest)
+                    .then()
+                    .spec(ResponseSpecificationFactory.createDefault())
+                    .extract()
+                    .response();
+
+        }
+
+        return response;
 
     }
 

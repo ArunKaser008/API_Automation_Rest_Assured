@@ -1,5 +1,6 @@
 package com.framework.auth;
 
+import com.framework.models.ApiRequest;
 import io.restassured.specification.RequestSpecification;
 
 /**
@@ -14,6 +15,6 @@ public interface AuthStrategy {
      *
      * @param specification Rest Assured RequestSpecification
      */
-    void apply(RequestSpecification specification);
+    void apply(RequestSpecification specification, ApiRequest apiRequest);
 
 }
