@@ -1,11 +1,14 @@
 package com.framework.stepdefinitions;
 
 import com.framework.api.UserApi;
+import com.framework.mapper.ResponseMapper;
+import com.framework.models.response.UserResponse;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.testng.Assert.*;
@@ -15,6 +18,7 @@ public class UserSteps {
     private final UserApi userApi = new UserApi();
 
     private Response response;
+    private List<UserResponse> user;
 
     @Given("User API is available")
     public void userApiIsAvailable() {
@@ -24,9 +28,11 @@ public class UserSteps {
     }
     @When("I retrieve user with id {int}")
     public void retrieveUser(int id) {
-
         response = userApi.getUser(id);
-
+        assertNotNull(response, "Response should not be null.");
+        UserResponse userResponse = ResponseMapper.toObject(response, UserResponse.class);
+        assertNotNull(userResponse, "UserResponse should not be null.");
+        user = Collections.singletonList(userResponse); // Wrap the single object in a list
     }
 
     @When("I retrieve all users")
@@ -79,31 +85,20 @@ public class UserSteps {
     }
 
     @Then("the user id should be {int}")
-    public void verifyUserId(int expectedId) {
-
-        assertEquals(
-                response.jsonPath().getInt("id"),
-                expectedId);
-
+    public void verifyUserId(int id) {
+        assertEquals(user.get(0).getId().intValue(), id); // Access the first user in the list
     }
 
     @Then("the username should be {string}")
     public void verifyUsername(String username) {
-
-        assertEquals(
-                response.jsonPath().getString("username"),
-                username);
-
+        assertNotNull(user, "User list should not be null.");
+        assertFalse(user.isEmpty(), "User list should not be empty.");
+        assertEquals(user.get(0).getUsername(), username);
     }
 
     @Then("the email should contain {string}")
     public void verifyEmail(String value) {
-
-        assertTrue(
-                response.jsonPath()
-                        .getString("email")
-                        .contains(value));
-
+        assertTrue(user.get(0).getEmail().contains(value)); // Access the first user in the list
     }
 
     @Then("the response should contain {int} users")
