@@ -15,22 +15,22 @@ public final class ResponseMapper {
     private static final ObjectMapper OBJECT_MAPPER =
             new ObjectMapper();
 
-    static {
-        OBJECT_MAPPER.configure(
-                DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
-                false);
-    }
+        static {
+            OBJECT_MAPPER.configure(
+                    DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                    false);
+        }
 
-    private ResponseMapper() {
-        throw new UnsupportedOperationException(
-                "Utility class cannot be instantiated.");
-    }
+        private ResponseMapper() {
+            throw new UnsupportedOperationException(
+                    "Utility class cannot be instantiated.");
+        }
 
-    /**
-     * Maps API response to a single POJO.
-     *
-     * @param response Response
-     * @param clazz Target class
+        /**
+         * Maps API response to a single POJO.
+         *
+         * @param response Response
+         * @param clazz Target class
      * @return mapped object
      */
     public static <T> T toObject(Response response, Class<T> clazz) {

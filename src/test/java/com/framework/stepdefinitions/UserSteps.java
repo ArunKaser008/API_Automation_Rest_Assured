@@ -3,6 +3,7 @@ package com.framework.stepdefinitions;
 import com.framework.api.UserApi;
 import com.framework.mapper.ResponseMapper;
 import com.framework.models.response.UserResponse;
+import com.framework.validator.ResponseValidator;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -78,27 +79,36 @@ public class UserSteps {
     }
 
     @Then("the response status code should be {int}")
-    public void verifyStatusCode(int expectedStatus) {
+    public void verifyStatusCode(int statusCode) {
 
-        assertEquals(response.statusCode(), expectedStatus);
+        ResponseValidator.verifyStatusCode(
+                response,
+                statusCode);
 
     }
 
     @Then("the user id should be {int}")
     public void verifyUserId(int id) {
-        assertEquals(user.get(0).getId().intValue(), id); // Access the first user in the list
+        ResponseValidator.verifyJsonPath(
+                response,
+                "id",
+                id);
     }
 
     @Then("the username should be {string}")
     public void verifyUsername(String username) {
-        assertNotNull(user, "User list should not be null.");
-        assertFalse(user.isEmpty(), "User list should not be empty.");
-        assertEquals(user.get(0).getUsername(), username);
+        ResponseValidator.verifyJsonPath(
+                response,
+                "username",
+                username);
     }
 
     @Then("the email should contain {string}")
     public void verifyEmail(String value) {
-        assertTrue(user.get(0).getEmail().contains(value)); // Access the first user in the list
+        ResponseValidator.verifyJsonPath(
+                response,
+                "email",
+                value);
     }
 
     @Then("the response should contain {int} users")
@@ -147,5 +157,16 @@ public class UserSteps {
                 response.getTime() < time);
 
     }
+
+    @Then("response should match user schema")
+    public void verifySchema() {
+
+        SchemaValidator.validate(
+                response,
+                "user-schema.json");
+
+    }
+
+
 
 }
