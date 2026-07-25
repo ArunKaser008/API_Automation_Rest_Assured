@@ -1,71 +1,68 @@
 package com.framework.client;
 
+import com.framework.context.FrameworkContext;
 import com.framework.core.executor.HttpExecutor;
 import com.framework.core.executor.HttpExecutorRegistry;
+import com.framework.enums.HttpMethod;
 import com.framework.models.ApiRequest;
+import com.framework.retry.DefaultRetryPolicy;
+import com.framework.retry.RetryExecutor;
+import com.framework.retry.RetryPolicy;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 /**
- * Generic HTTP client responsible for executing REST requests.
+ * Enterprise API Client.
  */
 public class ApiClient {
 
     private final RequestSpecification requestSpecification;
 
-    /**
-     * Creates ApiClient with default Request Specification.
-     */
-    public ApiClient() {
+    private final RetryExecutor retryExecutor;
 
-        this.requestSpecification =
-                RequestSpecificationFactory.getDefaultRequestSpecification();
-
-    }
-
-    /**
-     * Creates ApiClient with custom Request Specification.
-     *
-     * @param requestSpecification Request Specification
-     */
     public ApiClient(RequestSpecification requestSpecification) {
 
         this.requestSpecification = requestSpecification;
 
-    }
+        RetryPolicy retryPolicy = createRetryPolicy();
 
-    public Response get(ApiRequest request) {
-
-        return execute(HttpMethod.GET, request);
-
-    }
-
-    public Response post(ApiRequest request) {
-
-        return execute(HttpMethod.POST, request);
+        this.retryExecutor =
+                new RetryExecutor(retryPolicy);
 
     }
 
-    public Response put(ApiRequest request) {
+    public Response get(ApiRequest apiRequest) {
 
-        return execute(HttpMethod.PUT, request);
-
-    }
-
-    public Response patch(ApiRequest request) {
-
-        return execute(HttpMethod.PATCH, request);
+        return execute(HttpMethod.GET, apiRequest);
 
     }
 
-    public Response delete(ApiRequest request) {
+    public Response post(ApiRequest apiRequest) {
 
-        return execute(HttpMethod.DELETE, request);
+        return execute(HttpMethod.POST, apiRequest);
+
+    }
+
+    public Response put(ApiRequest apiRequest) {
+
+        return execute(HttpMethod.PUT, apiRequest);
+
+    }
+
+    public Response patch(ApiRequest apiRequest) {
+
+        return execute(HttpMethod.PATCH, apiRequest);
+
+    }
+
+    public Response delete(ApiRequest apiRequest) {
+
+        return execute(HttpMethod.DELETE, apiRequest);
 
     }
 
     /**
-     * Generic HTTP execution.
+     * Common execution engine.
      */
     private Response execute(HttpMethod httpMethod,
                              ApiRequest apiRequest) {
@@ -73,29 +70,39 @@ public class ApiClient {
         HttpExecutor executor =
                 HttpExecutorRegistry.get(httpMethod);
 
-        Response response = executor
-                .execute(requestSpecification, apiRequest)
-                .then()
-                .spec(ResponseSpecificationFactory.createDefault())
-                .extract()
-                .response();
+        if (FrameworkContext.getInstance()
+                .config()
+                .isRetryEnabled()) {
 
-        // If unauthorized and using bearer auth, try refreshing token once and retry
-        if (response.getStatusCode() == 401 && apiRequest.getAuthType() == com.framework.auth.AuthType.BEARER) {
-
-            // Force refresh token and retry the request once
-            com.framework.auth.TokenManager.forceRefresh();
-
-            response = executor
-                    .execute(requestSpecification, apiRequest)
-                    .then()
-                    .spec(ResponseSpecificationFactory.createDefault())
-                    .extract()
-                    .response();
+            return retryExecutor.execute(() ->
+                    executor.execute(
+                            requestSpecification,
+                            apiRequest));
 
         }
 
-        return response;
+        return executor.execute(
+                requestSpecification,
+                apiRequest);
+
+    }
+
+    /**
+     * Creates retry policy from configuration.
+     */
+    private RetryPolicy createRetryPolicy() {
+
+        return new DefaultRetryPolicy(
+
+                FrameworkContext.getInstance()
+                        .config()
+                        .getRetryMaxAttempts(),
+
+                FrameworkContext.getInstance()
+                        .config()
+                        .getRetryInterval()
+
+        );
 
     }
 

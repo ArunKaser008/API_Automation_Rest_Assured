@@ -27,4 +27,12 @@ public final class FrameworkConfig {
 
     public static final String RESPONSE_TIMEOUT = "response.timeout";
 
+    public static final String RETRY_ENABLED = "retry.enabled";
+
+    public static final String RETRY_MAX_ATTEMPTS = "retry.max.attempts";
+
+    public static final String RETRY_INTERVAL = "retry.interval";
+
+    public static final String RETRY_STATUS_CODES = "retry.retryable.codes";
+
 }

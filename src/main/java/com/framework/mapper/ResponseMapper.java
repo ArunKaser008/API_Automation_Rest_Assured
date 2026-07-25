@@ -3,6 +3,7 @@ package com.framework.mapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.response.Response;
+import io.qameta.allure.Allure;
 
 import java.util.List;
 
@@ -37,6 +38,12 @@ public final class ResponseMapper {
         try {
             return OBJECT_MAPPER.readValue(response.asString(), clazz);
         } catch (Exception exception) {
+            // Attach raw response to Allure to help debugging mapping issues
+            try {
+                Allure.addAttachment("Response (mapping failure)", "text/plain", response.asString(), ".txt");
+            } catch (Exception ignored) {
+                // ignore
+            }
             throw new RuntimeException(
                     "Unable to map response to object.",
                     exception);
@@ -57,6 +64,12 @@ public final class ResponseMapper {
                     OBJECT_MAPPER.getTypeFactory()
                             .constructCollectionType(List.class, clazz));
         } catch (Exception exception) {
+            // Attach raw response to Allure to help debugging mapping issues
+            try {
+                Allure.addAttachment("Response (mapping failure)", "text/plain", response.asString(), ".txt");
+            } catch (Exception ignored) {
+                // ignore
+            }
             throw new RuntimeException(
                     "Unable to map response.",
                     exception);

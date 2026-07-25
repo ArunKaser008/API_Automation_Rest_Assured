@@ -173,4 +173,54 @@ public final class ConfigManager {
 
     }
 
+    /**
+     * Returns whether retry is enabled.
+     */
+    public boolean isRetryEnabled() {
+
+        return Boolean.parseBoolean(
+                get(FrameworkConfig.RETRY_ENABLED));
+
+    }
+
+    /**
+     * Returns maximum retry attempts.
+     */
+    public int getRetryMaxAttempts() {
+
+        try {
+
+            return Integer.parseInt(
+                    get(FrameworkConfig.RETRY_MAX_ATTEMPTS));
+
+        } catch (NumberFormatException exception) {
+
+            throw new ConfigurationException(
+                    "Invalid retry max attempts.",
+                    exception);
+
+        }
+
+    }
+
+    /**
+     * Returns retry interval in milliseconds.
+     */
+    public long getRetryInterval() {
+
+        try {
+
+            return Long.parseLong(
+                    get(FrameworkConfig.RETRY_INTERVAL));
+
+        } catch (NumberFormatException exception) {
+
+            throw new ConfigurationException(
+                    "Invalid retry interval.",
+                    exception);
+
+        }
+
+    }
+
 }
