@@ -1,6 +1,7 @@
 package com.framework.api;
 
 import com.framework.client.ApiClient;
+import com.framework.client.RequestSpecificationFactory;
 
 /**
  * Base class for all API classes.
@@ -13,7 +14,7 @@ public abstract class BaseApi {
 
     protected BaseApi() {
 
-        this.apiClient = new ApiClient();
+        this.apiClient = new ApiClient(RequestSpecificationFactory.getDefaultRequestSpecification());
 
     }
 

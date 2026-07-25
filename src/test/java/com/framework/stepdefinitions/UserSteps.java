@@ -106,10 +106,12 @@ public class UserSteps {
 
     @Then("the email should contain {string}")
     public void verifyEmail(String value) {
-        ResponseValidator.verifyJsonPath(
+
+        ResponseValidator.verifyJsonPathContains(
                 response,
                 "email",
                 value);
+
     }
 
     @Then("the response should contain {int} users")

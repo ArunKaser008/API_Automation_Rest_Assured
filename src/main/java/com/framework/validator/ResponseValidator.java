@@ -257,4 +257,40 @@ public final class ResponseValidator {
 
     }
 
+    /**
+     * Validates that a JSON field contains the expected text.
+     *
+     * @param response API Response
+     * @param jsonPath JSON Path
+     * @param expectedValue Expected substring
+     */
+    public static void verifyJsonPathContains(Response response,
+                                              String jsonPath,
+                                              String expectedValue) {
+
+        validateResponse(response);
+
+        Object value = response.jsonPath().get(jsonPath);
+
+        if (value == null) {
+
+            throw new AssertionError(
+                    "JSON Path not found : " + jsonPath);
+
+        }
+
+        String actualValue = value.toString();
+
+        if (!actualValue.contains(expectedValue)) {
+
+            throw new AssertionError(
+                    "JSON Path Validation Failed."
+                            + "\nPath : " + jsonPath
+                            + "\nExpected to contain : " + expectedValue
+                            + "\nActual : " + actualValue);
+
+        }
+
+    }
+
 }
