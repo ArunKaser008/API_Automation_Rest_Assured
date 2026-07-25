@@ -3,7 +3,6 @@ package com.framework.client;
 import com.framework.context.FrameworkContext;
 import com.framework.core.executor.HttpExecutor;
 import com.framework.core.executor.HttpExecutorRegistry;
-import com.framework.enums.HttpMethod;
 import com.framework.models.ApiRequest;
 import com.framework.retry.DefaultRetryPolicy;
 import com.framework.retry.RetryExecutor;
