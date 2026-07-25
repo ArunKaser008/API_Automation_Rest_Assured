@@ -1,6 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
   "type": "object",
+  "title": "User Response Schema",
+  "description": "Schema for validating user API response",
 
   "required": [
     "id",
@@ -12,19 +14,91 @@
   "properties": {
 
     "id": {
-      "type": "integer"
+      "type": "integer",
+      "description": "Unique user identifier"
     },
 
     "name": {
-      "type": "string"
+      "type": "string",
+      "description": "User's full name"
     },
 
     "username": {
-      "type": "string"
+      "type": "string",
+      "description": "User's username"
     },
 
     "email": {
-      "type": "string"
+      "type": "string",
+      "format": "email",
+      "description": "User's email address"
+    },
+
+    "phone": {
+      "type": "string",
+      "description": "User's phone number"
+    },
+
+    "website": {
+      "type": "string",
+      "format": "uri",
+      "description": "User's website URL"
+    },
+
+    "address": {
+      "type": "object",
+      "description": "User's address",
+      "properties": {
+        "street": {
+          "type": "string",
+          "description": "Street address"
+        },
+        "suite": {
+          "type": "string",
+          "description": "Suite or apartment number"
+        },
+        "city": {
+          "type": "string",
+          "description": "City name"
+        },
+        "zipcode": {
+          "type": "string",
+          "description": "Postal code"
+        },
+        "geo": {
+          "type": "object",
+          "description": "Geographical coordinates",
+          "properties": {
+            "lat": {
+              "type": "string",
+              "description": "Latitude"
+            },
+            "lng": {
+              "type": "string",
+              "description": "Longitude"
+            }
+          }
+        }
+      }
+    },
+
+    "company": {
+      "type": "object",
+      "description": "User's company information",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Company name"
+        },
+        "catchPhrase": {
+          "type": "string",
+          "description": "Company catch phrase"
+        },
+        "bs": {
+          "type": "string",
+          "description": "Company business service"
+        }
+      }
     }
 
   }

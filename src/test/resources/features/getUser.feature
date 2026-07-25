@@ -56,3 +56,22 @@ Feature: User API Validation
   Scenario: Verify response time
     When I retrieve user with id 1
     Then response time should be less than 5000 milliseconds
+
+  @SchemaValidation
+  Scenario: Validate user response against schema
+    When I retrieve user with id 1
+    Then the response status code should be 200
+    And response should match user schema
+
+  @SchemaValidation
+  Scenario: Validate user schema with all required fields
+    When I retrieve user with id 1
+    Then response should match user schema
+    And the user id should be 1
+    And the username should not be empty
+
+  @SchemaValidation
+  Scenario: Validate multiple users schema
+    When I retrieve all users
+    Then the response status code should be 200
+    And the response should contain 10 users

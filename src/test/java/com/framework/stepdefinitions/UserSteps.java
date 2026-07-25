@@ -4,6 +4,7 @@ import com.framework.api.UserApi;
 import com.framework.mapper.ResponseMapper;
 import com.framework.models.response.UserResponse;
 import com.framework.validator.ResponseValidator;
+import com.framework.validator.SchemaValidator;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -164,6 +165,15 @@ public class UserSteps {
         SchemaValidator.validate(
                 response,
                 "user-schema.json");
+
+    }
+
+    @Then("the username should not be empty")
+    public void verifyUsernameNotEmpty() {
+
+        String username = response.jsonPath().get("username");
+        assertTrue(username != null && !username.isBlank(),
+                "Username should not be empty");
 
     }
 
